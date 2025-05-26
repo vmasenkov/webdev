@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e9e6da;
+        }
+        header {
+            background-color: #2a4b7c;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        nav {
+            background-color: #345d98;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 0.5rem;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+        }
+        main {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 1rem;
+            padding: 1rem;
+        }
+        article {
+            background-color: #f6f1e5;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .content section {
+            display: flex;
+            background-color: #f6f1e5;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .content section .category-img {
+            flex: 50%;
+        }
+        .content section .category-info {
+            flex: 50%;
+        }
+
+        aside > section{
+            background-color: #e3eaf4;
+            padding: 1rem;
+        }
+        aside > section a{
+            color: black;
+            text-decoration: none;
+        }
+
+        aside > section ul {
+            padding-inline-start: 15px;
+        }
+
+        footer {
+            background-color: #2a4b7c;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+        }
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+            nav {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>NEWS WEBSITE</h1>
+    </header>
+    <nav>
+        <a href="#">Home</a>
+        <a href="#">World</a>
+        <a href="#">Politics</a>
+        <a href="#">Business</a>
+    </nav>
+    <main>
+        <div class="content">
+            <article>
+                <img src="/path/to/image.jpg" alt="Main Story Image" style="width:100%;">
+                <h2>Main Story Title</h2>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </article>
+            <section>
+                <div class="category-img">
+                    <img src="/path/to/image.jpg" alt="Main Story Image" style="width:100%;">
+                </div>
+                <div class="category-info">
+                    <h3>World</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                </div>
+            </section>
+            <section>
+                <div class="category-info">
+                    <h3>Politics</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                </div>
+                <div class="category-img">
+                    <img src="/path/to/image.jpg" alt="Main Story Image" style="width:100%;">
+                </div>
+            </section>
+            <section>
+                <div class="category-img">
+                    <img src="/path/to/image.jpg" alt="Main Story Image" style="width:100%;">
+                </div>
+                <div class="category-info">
+                    <h3>Business</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                </div>
+            </section>
+        </div>
+
+        <aside>
+            <section>
+                <h3>Search</h3>
+                <input type="text" placeholder="Search...">
+                <button>Search</button>
+
+                <h3>Popular News</h3>
+                <ul>
+                    <li><a href="#">Popular News Headline</a></li>
+                    <li><a href="#">Popular News Headline</a></li>
+                    <li><a href="#">Popular News Headline</a></li>
+                </ul>
+            </section>
+            <section>
+                <h3>Latest News</h3>
+                <ul>
+                    <li><a href="#">Latest News Headline</a></li>
+                    <li><a href="#">Latest News Headline</a></li>
+                    <li><a href="#">Latest News Headline</a></li>
+                </ul>
+            </section>
+        </aside>
+    </main>
+    <footer>
+        <p>&copy; 2024 News Website</p>
+    </footer>
+</body>
+</html>
