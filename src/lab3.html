@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>News Website</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
+        * {
+        box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -49,6 +54,19 @@
         .content section .category-img {
             flex: 50%;
         }
+
+        article img {
+            border-radius: 20px;
+        }
+
+        .category-img {
+            padding: 0 5% 0 5%;
+        }
+
+        .category-img img {
+            border-radius: 20px;
+        }
+
         .content section .category-info {
             flex: 50%;
         }
@@ -56,6 +74,7 @@
         aside > section{
             background-color: #e3eaf4;
             padding: 1rem;
+            margin-bottom: 1rem;
         }
         aside > section a{
             color: black;
@@ -72,6 +91,40 @@
             text-align: center;
             padding: 1rem;
         }
+
+        form.search input[type=text] {
+            padding: 10px;
+            font-size: 17px;
+            border: 1px solid grey;
+            float: left;
+            width: 80%;
+            background: #f1f1f1;
+        }
+
+            /* Style the submit button */
+        form.search button {
+            float: left;
+            width: 20%;
+            padding: 10px;
+            background: #305f86;
+            color: white;
+            font-size: 17px;
+            border: 1px solid grey;
+            border-left: none; /* Prevent double borders */
+            cursor: pointer;
+        }
+
+        form.search button:hover {
+            background: #0b7dda;
+        }
+
+            /* Clear floats */
+        form.search::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
         @media (max-width: 768px) {
             main {
                 grid-template-columns: 1fr;
@@ -82,6 +135,7 @@
         }
     </style>
 </head>
+
 <body>
     <header>
         <h1>NEWS WEBSITE</h1>
@@ -95,13 +149,13 @@
     <main>
         <div class="content">
             <article>
-                <img src="/path/to/image.jpg" alt="Main Story Image" style="width:100%;">
+                <img src="images/main_img.jpg" alt="Main Story Image" style="width:100%;">
                 <h2>Main Story Title</h2>
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
             </article>
             <section>
                 <div class="category-img">
-                    <img src="/path/to/image.jpg" alt="Main Story Image" style="width:100%;">
+                    <img src="images/world_img.jpg" alt="Main Story Image" style="width:100%;">
                 </div>
                 <div class="category-info">
                     <h3>World</h3>
@@ -114,12 +168,12 @@
                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
                 </div>
                 <div class="category-img">
-                    <img src="/path/to/image.jpg" alt="Main Story Image" style="width:100%;">
+                    <img src="images/politics_img.jpg" alt="Main Story Image" style="width:100%;">
                 </div>
             </section>
             <section>
                 <div class="category-img">
-                    <img src="/path/to/image.jpg" alt="Main Story Image" style="width:100%;">
+                    <img src="images/business_img.jpg" alt="Main Story Image" style="width:100%;">
                 </div>
                 <div class="category-info">
                     <h3>Business</h3>
@@ -131,8 +185,11 @@
         <aside>
             <section>
                 <h3>Search</h3>
-                <input type="text" placeholder="Search...">
-                <button>Search</button>
+
+                <form class="search" action="/search">
+                    <input type="text" placeholder="Search.." name="search">
+                    <button type="submit"><i class="fa fa-search"></i></button>
+                </form>
 
                 <h3>Popular News</h3>
                 <ul>
