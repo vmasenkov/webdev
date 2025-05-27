@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="uk">
+ <head>
+ <meta charset="UTF-8">
+ <title>Орбіта місяця на CSS3</title>
+ <style>
+      body {
+      background: #000;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #earth {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 200px;
+      height: 200px;
+      transform: translate(-50%, -50%);
+      z-index: 2; /* Земля під місяцем */
+    }
+
+    #moon {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      top: 47%;
+      left: 47%;
+      animation: orbita 8s linear infinite;
+      z-index: 3; /* Місяць завжди над землею */
+    }
+
+    @keyframes orbita {
+      0% {
+        transform: translateX(0px) translateY(0px) rotate(0deg);
+        z-index: 1;
+      }
+      25% {
+        transform: translateX(150px) translateY(-100px) rotate(10deg);
+        z-index: 1;
+        width: 60px;
+        height: 60px;
+      }
+      50% {
+        transform: translateX(20px) translateY(20px) rotate(40deg);
+        z-index: 3;
+        width: 70px;
+        height: 70px;
+      }
+      75% {
+        transform: translateX(-120px) translateY(110px) rotate(90deg);
+        z-index: 1;
+        width: 60px;
+        height: 60px;
+      }
+      100% {
+        transform: translateX(0px) translateY(0px) rotate(140deg);
+        z-index: 1;
+      }
+    }
+</style>
+ </head>
+ <body>
+    <img src="images/earth.png" id="earth">
+    <img src="images/moon.png" id="moon">
+ </body>
+</html>
