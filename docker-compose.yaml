@@ -1,6 +1,8 @@
 services:
   app:
-    image: php:8.2-fpm
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - ./src:/var/www/html
     expose:
