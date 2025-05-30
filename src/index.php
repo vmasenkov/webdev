@@ -23,6 +23,22 @@
   </header>
   <main role="main">
     <div class="container mb-3">
+      <div class="d-flex">
+        <div class="col-3">
+          <label for="filter" class="form-label">Фільтр за кількістю ліжок:</label>
+          <select id="filter" class="form-select">
+            <option value="0">all</option>
+            <option value="2">2 bads</option>
+            <option value="3">3 bads</option>
+            <option value="4">4 bads</option>
+        </select>
+        </div>
+        <div class="ms-auto align-self-end">
+          <button class="btn btn-primary" id="newRoomBtn">New room</button>
+        </div>
+      </div>
+    </div>
+    <div class="container mb-3">
       <div class="row">
         <div class="col-12">
           <h2>Календар бронювання</h2>
@@ -48,17 +64,103 @@
           {groupBy: "Month", format: "MMMM yyyy"},
           {groupBy: "Day", format: "d"}
       ],
+      rowHeaderColumns: [
+        {text: "Room", width: 80, display: "name"},
+        {text: "Capacity", width: 80, display: "capacity"},
+        {text: "Status", width: 80, display: "status"}
+      ],
       treeEnabled: true,
       treePreventParentUsage: true,
       heightSpec: "Max",
       eventMovingStartEndEnabled: false,
       eventResizingStartEndEnabled: false,
       timeRangeSelectingStartEndEnabled: true,
+      allowEventOverlap: false,
       onBeforeCellRender: args => {
           if (args.cell.start < new DayPilot.Date()) {
               args.cell.disabled = true;
               args.cell.backColor = "#ccc";
           }
+      },
+      onBeforeResHeaderRender: function (args) {
+        var beds = function(count) {
+            return count + " bed" + (count > 1 ? "s" : "");
+        };
+        args.resource.columns[1].html = beds(args.resource.capacity);
+        switch (args.resource.status) {
+            case "Dirty":
+                args.resource.cssClass = "status_dirty";
+                break;
+            case "Cleanup":
+                args.resource.cssClass = "status_cleanup";
+                break;
+        }
+      },
+      onBeforeEventRender: function (args) {
+        var start = new DayPilot.Date(args.e.start);
+        var end = new DayPilot.Date(args.e.end);
+
+        var today = DayPilot.Date.today();
+        var now = new DayPilot.Date();
+
+        args.e.html = "<div class='row'><div class='col-12'>" + args.e.text + " (" + start.toString("M/d/yyyy") + " - " + end.toString("M/d/yyyy") + ")" + "</div>" ;
+
+        switch (args.e.status) {
+            case "New":
+                var in2days = today.addDays(1);
+
+                if (start < in2days) {
+                    args.e.barColor = 'red';
+                    args.e.toolTip = 'Застаріле (не підтверджено вчасно)';
+                }
+                else {
+                    args.e.barColor = 'orange';
+                    args.e.toolTip = 'Новий';
+                }
+                break;
+            case "Confirmed":
+                var arrivalDeadline = today.addHours(18);
+
+                if (start < today || (start.getDatePart() === today.getDatePart() && now > arrivalDeadline)) { // must arrive before 6 pm
+                    args.e.barColor = "#f41616";  // red
+                    args.e.toolTip = 'Пізнє прибуття';
+                }
+                else {
+                    args.e.barColor = "green";
+                    args.e.toolTip = "Підтверджено";
+                }
+                break;
+            case 'Arrived': // arrived
+                var checkoutDeadline = today.addHours(10);
+
+                if (end < today || (end.getDatePart() === today.getDatePart() && now > checkoutDeadline)) { // must checkout before 10 am
+                    args.e.barColor = "#f41616";  // червоний
+                    args.e.toolTip = "Пізній виїзд";
+                }
+                else
+                {
+                    args.e.barColor = "#1691f4";  // блакитний
+                    args.e.toolTip = "Прибув";
+                }
+                break;
+            case 'CheckedOut': // перевірено
+                args.e.barColor = "gray";
+                args.e.toolTip = "Перевірено";
+                break;
+            default:
+                args.e.toolTip = "Невизначений стан";
+                break;
+        }
+
+        args.e.html = args.e.html + "<div class='col-12' style='color:gray'>" + args.e.toolTip + "</div></div>";
+
+        var paid = args.e.paid;
+        var paidColor = "#aaaaaa";
+
+        args.e.areas = [
+            { bottom: 10, right: 4, html: "<div style='color:" + paidColor + "; font-size: 8pt;'>Paid: " + paid + "%</div>", v: "Visible"},
+            { left: 4, bottom: 8, right: 4, height: 2, html: "<div style='background-color:" + paidColor + "; height: 100%; width:" + paid + "%'></div>", v: "Visible" }
+        ];
       },
       contextMenu: new DayPilot.Menu({
           items: [
@@ -123,6 +225,30 @@
               }
           });
       },
+      onEventMoved: async (args) => {
+          $.ajax({
+              url: "backend_move.php",
+              method: "POST",
+              data: {
+                  id: args.e.id,
+                  newStart: args.newStart.toString(),
+                  newEnd: args.newEnd.toString(),
+                  room: args.newResource
+              },
+              dataType: "json",
+              success: (data) => {
+                  if (data.result === "OK") {
+                      dp.message("Event moved successfully.");
+                      document.app.loadData();
+                  } else {
+                      dp.message("Error moving event: " + data.message);
+                  }
+              },
+              error: (xhr, status, error) => {
+                  dp.message("Error moving event:", error);
+              }
+          });
+      }
     });
     dp.init();
 
@@ -138,7 +264,9 @@
       updateResources(data) {
           const resources = data.map((room) => ({
               id: room.id,
-              name: room.name
+              name: room.name,
+              capacity: room.capacity,
+              status: room.status
           }));
           dp.update({resources});
       },
@@ -148,16 +276,22 @@
               name: event.name,
               text: event.text,
               resource: event.resource,
+              status: event.status,
+              paid: event.paid,
               start: new DayPilot.Date(event.start),
               end: new DayPilot.Date(event.end),
               bubbleHtml: event.bubbleHtml,
+              height: 70
           }));
           dp.update({events});
       },
       loadData() {
         $.ajax({
             url: "backend_rooms.php",
-            method: "GET",
+            method: "POST",
+            data: {
+                capacity: $("#filter").val()
+            },
             dataType: "json",
 
             success: (data) => {
@@ -256,9 +390,57 @@
                 dp.message('An error occurred: ' + error);
             }
         });
-      }
+      },
+      createRoom (event) {
+        event.preventDefault();
+        
+        var name = $("#f_room_create #name").val();
+        var capacity = $("#f_room_create #capacity").val();
+
+        $.ajax({
+            url: 'backend_room_create.php',
+            type: 'POST',
+            data: {
+                name: name,
+                capacity: capacity  
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.result == 'OK') {
+                    dp.message('Room created successfully with ID: ' + response.id);
+                    document.app.loadData(); // Reload data to reflect the new reservation
+                    DayPilot.Modal.close();
+                } else {
+                    dp.message('Error: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                dp.message('An error occurred: ' + error);
+            }
+        });
+      },
     };
     document.app.loadData();
+
+    $("#filter").change(function() {
+        document.app.loadData();
+    });
+    $("#newRoomBtn").click(function() {
+        $.ajax({
+              url: "room_new.php",
+              method: "GET",
+              dataType: "html",
+              success: (data) => {
+                  var modal = new DayPilot.Modal({
+                    useIframe: false,
+                  })
+                  modal.showHtml(data)
+              },
+              error: (xhr, status, error) => {
+                  dp.message("Error loading new html:", error);
+              }
+        });
+    });
   });
 </script>
 <script type="text/javascript">

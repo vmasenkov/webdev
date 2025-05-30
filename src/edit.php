@@ -13,7 +13,7 @@
 
         ?>
         <form id="f_update" action="backend_update.php" method="post" style="padding:20px;" onsubmit="document.app.updateReservation(event); return false;">
-            <h1>New Reservation</h1>
+            <h1>Edit Reservation</h1>
             <input type="hidden" id="id" name="id" value="<?php echo $reservation["id"] ?>" />
             <div>Name: </div>
             <div><input type="text" id="name" name="name" value="<?php echo $reservation["name"] ?>" /></div>
